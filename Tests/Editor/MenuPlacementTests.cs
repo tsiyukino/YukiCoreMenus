@@ -132,5 +132,85 @@ namespace TsiYuki.Core.Menus.Editor.Tests
             Assert.That(Keys(Resolve()), Is.EqualTo(new[] { "warn.menu_parent_missing" }));
             Assert.That(rootA.transform.parent, Is.Not.SameAs(rootB.transform));
         }
+
+        [Test]
+        public void ObjectCarryingAnotherToolTakesItsMenu()
+        {
+            var (a, rootA) = Tool("A");
+            var (b, rootB) = Tool("B");
+            MenuPlacement.Place(a, b.gameObject, rootA, "A"); // what dragging from the Hierarchy gives
+            MenuPlacement.Place(b, null, rootB, "B");
+
+            Assert.That(Resolve(), Is.Empty);
+            Assert.That(rootA.transform.parent, Is.SameAs(rootB.transform));
+        }
+
+        [Test]
+        public void AnyOtherComponentOnThatObjectWorksToo()
+        {
+            var (a, rootA) = Tool("A");
+            var (b, rootB) = Tool("B");
+            MenuPlacement.Place(a, b.transform, rootA, "A");
+            MenuPlacement.Place(b, null, rootB, "B");
+
+            Assert.That(Resolve(), Is.Empty);
+            Assert.That(rootA.transform.parent, Is.SameAs(rootB.transform));
+        }
+
+        [Test]
+        public void ObjectCarryingTwoMenusIsAmbiguous()
+        {
+            var (a, rootA) = Tool("A");
+            var both = Make("Both");
+            var first = both.AddComponent<BoxCollider>();
+            var second = both.AddComponent<SphereCollider>();
+            MenuPlacement.Place(first, null, MenuItems.Root(Make("First host").transform, "First", null), "First");
+            MenuPlacement.Place(second, null, MenuItems.Root(Make("Second host").transform, "Second", null), "Second");
+            var parent = rootA.transform.parent;
+            MenuPlacement.Place(a, both, rootA, "A");
+
+            Assert.That(Keys(Resolve()), Is.EqualTo(new[] { "warn.menu_parent_ambiguous" }));
+            Assert.That(rootA.transform.parent, Is.SameAs(parent));
+        }
+
+        [Test]
+        public void OwnObjectWouldContainItself()
+        {
+            var (a, rootA) = Tool("A");
+            var parent = rootA.transform.parent;
+            MenuPlacement.Place(a, a.gameObject, rootA, "A");
+
+            Assert.That(Keys(Resolve()), Is.EqualTo(new[] { "warn.menu_cycle" }));
+            Assert.That(rootA.transform.parent, Is.SameAs(parent));
+        }
+
+        [Test]
+        public void MenuItemOnTheObjectWinsOverATsiYukiMenu()
+        {
+            var (a, rootA) = Tool("A");
+            var (b, rootB) = Tool("B");
+            b.gameObject.AddComponent<ModularAvatarMenuItem>();
+            var parent = rootA.transform.parent;
+            MenuPlacement.Place(b, null, rootB, "B");
+            MenuPlacement.Place(a, b.gameObject, rootA, "A");
+
+            Assert.That(Resolve(), Is.Empty);
+            Assert.That(rootA.transform.parent, Is.SameAs(parent));
+            Assert.That(b.GetComponentsInChildren<Component>().Any(c => c.GetType().Name == "ModularAvatarMenuInstallTarget"));
+        }
+
+        [Test]
+        public void ResetForgetsABuildThatNeverFinished()
+        {
+            var (a, rootA) = Tool("A");
+            var (b, rootB) = Tool("B");
+            var parent = rootA.transform.parent;
+            MenuPlacement.Place(b, null, rootB, "B");
+            MenuPlacement.Place(a, b, rootA, "A");
+
+            MenuRegistry.Reset(); // the next build's first pass
+            Assert.That(Resolve(), Is.Empty);
+            Assert.That(rootA.transform.parent, Is.SameAs(parent));
+        }
     }
 }

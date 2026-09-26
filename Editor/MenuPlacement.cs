@@ -11,15 +11,18 @@ namespace TsiYuki.Core.Menus.Editor
     ///
     /// a menu asset, which Modular Avatar's installer takes directly; an object
     /// already carrying a menu item, which takes an install target underneath
-    /// it; and another TsiYuki menu, which may not have been generated yet and
-    /// so waits for <see cref="MenuRegistry"/>.
+    /// it; and another TsiYuki menu — its component, or the object carrying it —
+    /// which may not have been generated yet and so waits for
+    /// <see cref="MenuRegistry"/>. An object carrying a menu item counts as the
+    /// menu item even if a TsiYuki component is on it too.
     ///
-    /// Call it from a pass that runs before <c>moe.tsiyuki.core.menus</c>.
+    /// Call it from a pass declared <c>BeforePlugin&lt;MenusPlugin&gt;()</c>.
     /// </summary>
     public static class MenuPlacement
     {
         /// <param name="source">The component whose menu this is.</param>
-        /// <param name="destination">Where the user wants it; null for the avatar's root menu.</param>
+        /// <param name="destination">Where the user wants it, usually from <see cref="MenuParentField"/>;
+        /// null for the avatar's root menu.</param>
         /// <param name="menuRoot">The menu's root, as <see cref="MenuItems.Root"/> made it.</param>
         /// <param name="label">How warnings name the menu.</param>
         public static void Place(Object source, Object destination, GameObject menuRoot, string label)
@@ -45,7 +48,7 @@ namespace TsiYuki.Core.Menus.Editor
                 return;
             }
 
-            // Otherwise it should be another TsiYuki component, whose menu may not exist yet.
+            // Otherwise it should be another TsiYuki menu, which may not exist yet.
             MenuRegistry.RequestMove(source, destination, label);
         }
 

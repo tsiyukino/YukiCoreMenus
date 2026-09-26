@@ -4,6 +4,28 @@ Modular Avatar menu building and placement shared by TsiYuki tools that generate
 
 Part of the TsiYuki Core family: VCC installs it along with the tools that need it, so there is no reason to add it by hand.
 
+## For tool authors
+
+- Build the menu with `MenuItems.Root`, `MenuItems.SubMenu` and `MenuItems.Control`.
+- Draw the user's **Install into** setting with `MenuParentField.Draw`; its label and explanation come from
+  this package, so every tool shows the same field.
+- At build time, call `MenuPlacement.Place(component, installInto, menuRoot, label)` from a pass declared
+  `.BeforePlugin<MenusPlugin>()`.
+
+What **Install into** can hold:
+
+| Destination | Result |
+| --- | --- |
+| empty | the avatar's root menu |
+| a menu asset | Modular Avatar's installer puts the menu in it |
+| an object with a Modular Avatar menu item | an install target under that object |
+| another TsiYuki menu's component | inside that menu |
+| the object carrying another TsiYuki menu, or any other component on it | inside that menu; an object carrying more than one TsiYuki menu is reported as ambiguous |
+
+An object with a Modular Avatar menu item counts as the menu item even when a TsiYuki component is on it too. A
+destination that makes no menu, or would put a menu inside itself, is reported in NDMF's error window and the
+menu stays at the root.
+
 ## License
 
 MIT
