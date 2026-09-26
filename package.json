@@ -1,0 +1,20 @@
+{
+  "name": "moe.tsiyuki.core.menus",
+  "displayName": "TsiYuki Core Menus",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Modular Avatar menu building and placement shared by TsiYuki tools that generate menus.",
+  "author": {
+    "name": "TsiYuki",
+    "url": "https://github.com/tsiyukino"
+  },
+  "license": "MIT",
+  "documentationUrl": "https://github.com/tsiyukino/YukiCoreMenus",
+  "changelogUrl": "https://github.com/tsiyukino/YukiCoreMenus/blob/main/CHANGELOG.md",
+  "vpmDependencies": {
+    "com.vrchat.avatars": ">=3.7.0",
+    "nadena.dev.ndmf": ">=1.11.0 <2.0.0",
+    "nadena.dev.modular-avatar": ">=1.12.0 <2.0.0",
+    "moe.tsiyuki.core": ">=0.4.0"
+  }
+}

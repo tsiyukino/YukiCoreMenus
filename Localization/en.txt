@@ -1,0 +1,4 @@
+# Placement warnings. {0} is the menu, {1} the component it was to go into.
+warn.menu_parent_missing = {0}: {1} makes no menu of its own, so this stays in the root menu.
+warn.menu_cycle = {0}: installing into {1} would put a menu inside itself, so this stays in the root menu.
+warn.no_install_target = {0}: this Modular Avatar version has no Menu Install Target, so the menu stays in the root menu.

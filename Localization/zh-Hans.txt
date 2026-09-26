@@ -1,0 +1,4 @@
+# 放置警告。{0} 是菜单，{1} 是要装进去的组件。
+warn.menu_parent_missing = {0}：{1} 本身不生成菜单，所以这个留在根菜单。
+warn.menu_cycle = {0}：装进 {1} 会让菜单套进自己里面，所以这个留在根菜单。
+warn.no_install_target = {0}：当前 Modular Avatar 版本没有 Menu Install Target，菜单留在根菜单。

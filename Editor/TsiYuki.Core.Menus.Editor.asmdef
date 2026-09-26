@@ -1,0 +1,22 @@
+{
+    "name": "TsiYuki.Core.Menus.Editor",
+    "rootNamespace": "TsiYuki.Core.Menus.Editor",
+    "references": [
+        "TsiYuki.Core.Editor",
+        "nadena.dev.ndmf",
+        "nadena.dev.modular-avatar.core",
+        "VRC.SDKBase",
+        "VRC.SDK3A"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

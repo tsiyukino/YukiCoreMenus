@@ -1,0 +1,4 @@
+# 配置の警告。{0} はメニュー、{1} は入れる先のコンポーネント。
+warn.menu_parent_missing = {0}: {1} 自体はメニューを生成しないため、ルートメニューのままにします。
+warn.menu_cycle = {0}: {1} に入れるとメニューが自分自身を含むことになるため、ルートメニューのままにします。
+warn.no_install_target = {0}: この Modular Avatar には Menu Install Target がないため、ルートメニューのままにします。
