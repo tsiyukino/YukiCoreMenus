@@ -41,6 +41,7 @@ namespace TsiYuki.Core.Menus.Editor
         }
 
         static readonly Dictionary<int, GameObject> Roots = new Dictionary<int, GameObject>();
+        static readonly Dictionary<int, string> Names = new Dictionary<int, string>();
         static readonly Dictionary<int, List<int>> MenusOnObject = new Dictionary<int, List<int>>();
         static readonly List<Request> Requests = new List<Request>();
 
@@ -50,6 +51,7 @@ namespace TsiYuki.Core.Menus.Editor
             if (source == null || menuRoot == null) return;
             var id = source.GetInstanceID();
             Roots[id] = menuRoot;
+            Names[id] = source.name;
 
             var component = source as Component;
             if (component == null) return;
@@ -59,18 +61,23 @@ namespace TsiYuki.Core.Menus.Editor
             if (!menus.Contains(id)) menus.Add(id);
         }
 
-        /// <summary>"Move my menu inside the menu that component, or the one on that object, generates."</summary>
+        /// <summary>
+        /// "Move my menu inside the menu that component, or the one on that
+        /// object, generates." The destination may already be destroyed, when
+        /// its tool ran first; only its id is read then.
+        /// </summary>
         public static void RequestMove(Object source, Object destination, string label)
         {
-            if (source == null || destination == null) return;
-            var component = destination as Component;
-            var go = component != null ? component.gameObject : destination as GameObject;
+            if (source == null || ReferenceEquals(destination, null)) return;
+            var alive = destination != null;
+            var component = alive ? destination as Component : null;
+            var go = component != null ? component.gameObject : alive ? destination as GameObject : null;
             Requests.Add(new Request
             {
                 Source = source.GetInstanceID(),
                 Destination = destination.GetInstanceID(),
                 DestinationObject = go != null ? go.GetInstanceID() : (int?)null,
-                DestinationName = destination.name,
+                DestinationName = alive ? destination.name : null,
                 Label = label,
                 Context = source,
             });
@@ -103,6 +110,7 @@ namespace TsiYuki.Core.Menus.Editor
         public static void Reset()
         {
             Roots.Clear();
+            Names.Clear();
             MenusOnObject.Clear();
             Requests.Clear();
         }
@@ -128,8 +136,12 @@ namespace TsiYuki.Core.Menus.Editor
             return Roots.TryGetValue(source, out root) && root != null;
         }
 
-        static void Warn(string key, Request request) =>
-            MenusText.Errors.Report(ErrorSeverity.NonFatal, key, request.Context, request.Label, request.DestinationName);
+        static void Warn(string key, Request request)
+        {
+            string registered;
+            var name = request.DestinationName ?? (Names.TryGetValue(request.Destination, out registered) ? registered : "?");
+            MenusText.Errors.Report(ErrorSeverity.NonFatal, key, request.Context, request.Label, name);
+        }
 
         /// <summary>
         /// The whole menu becomes a child of the destination's. Its root lists

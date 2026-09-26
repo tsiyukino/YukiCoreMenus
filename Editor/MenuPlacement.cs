@@ -28,7 +28,16 @@ namespace TsiYuki.Core.Menus.Editor
         public static void Place(Object source, Object destination, GameObject menuRoot, string label)
         {
             MenuRegistry.Register(source, menuRoot);
-            if (destination == null) return;
+            if (IsEmpty(destination)) return;
+
+            // Gone already: a TsiYuki component whose tool ran first and removed
+            // it at the end of its pass. Its menu was registered under its id,
+            // which is all a destroyed object still has.
+            if (destination == null)
+            {
+                MenuRegistry.RequestMove(source, destination, label);
+                return;
+            }
 
             var asset = destination as VRCExpressionsMenu;
             if (asset != null)
@@ -51,6 +60,12 @@ namespace TsiYuki.Core.Menus.Editor
             // Otherwise it should be another TsiYuki menu, which may not exist yet.
             MenuRegistry.RequestMove(source, destination, label);
         }
+
+        /// <summary>
+        /// An empty field holds null, or in the editor an object with no instance
+        /// behind it. A destroyed object also compares equal to null but keeps its id.
+        /// </summary>
+        static bool IsEmpty(Object o) => ReferenceEquals(o, null) || o.GetInstanceID() == 0;
 
         static void InstallUnder(Object source, GameObject destination, GameObject menuRoot, string label)
         {

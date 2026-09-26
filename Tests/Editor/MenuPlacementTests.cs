@@ -212,5 +212,31 @@ namespace TsiYuki.Core.Menus.Editor.Tests
             Assert.That(Resolve(), Is.Empty);
             Assert.That(rootA.transform.parent, Is.SameAs(parent));
         }
+
+        [Test]
+        public void DestinationRemovedByItsToolStillTakesTheMenu()
+        {
+            var (a, rootA) = Tool("A");
+            var (b, rootB) = Tool("B");
+            MenuPlacement.Place(b, null, rootB, "B");
+            Object.DestroyImmediate(b); // B's tool ran first and removed its component
+            MenuPlacement.Place(a, b, rootA, "A");
+
+            Assert.That(Resolve(), Is.Empty);
+            Assert.That(rootA.transform.parent, Is.SameAs(rootB.transform));
+        }
+
+        [Test]
+        public void DestroyedDestinationWithoutAMenuIsReported()
+        {
+            var (a, rootA) = Tool("A");
+            var gone = Make("Gone").AddComponent<BoxCollider>();
+            Object.DestroyImmediate(gone);
+            var parent = rootA.transform.parent;
+            MenuPlacement.Place(a, gone, rootA, "A");
+
+            Assert.That(Keys(Resolve()), Is.EqualTo(new[] { "warn.menu_parent_missing" }));
+            Assert.That(rootA.transform.parent, Is.SameAs(parent));
+        }
     }
 }
